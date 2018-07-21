@@ -68,34 +68,51 @@ Output: true
 #         return True
 
 
+# class Solution:
+#     def isValid(self, s):
+#         """
+#         :type s: str
+#         :rtype: bool
+#         """
+#         s = list(s)
+#         if len(s) == 0:
+#             return True
+
+#         for index in range(len(s)):
+#             if s[index] in ('}', ')', ']'):
+#                 break
+#         else:
+#             return False
+
+#         map_dict = {
+#             '}': '{',
+#             ')': '(',
+#             ']': '['
+#         }
+
+#         if index:
+#             if map_dict.get(s[index]) == s[index-1]:
+#                 s.pop(index)
+#                 s.pop(index-1)
+#                 return self.isValid(s)
+#         return False
+        
+
 class Solution:
     def isValid(self, s):
         """
         :type s: str
         :rtype: bool
         """
-        s = list(s)
-        if len(s) == 0:
-            return True
-
-        for index in range(len(s)):
-            if s[index] in ('}', ')', ']'):
-                break
-        else:
-            return False
-
-        map_dict = {
-            '}': '{',
-            ')': '(',
-            ']': '['
-        }
-
-        if index:
-            if map_dict.get(s[index]) == s[index-1]:
-                s.pop(index)
-                s.pop(index-1)
-                return self.isValid(s)
-        return False
-        
-
-
+        stack = [], 
+        paren_map = {
+            ')': '(', 
+            ']': '[', 
+            '}': '{'
+            }
+        for c in s:
+            if c not in paren_map: 
+                stack.append(c)
+            elif not stack or paren_map[c] != stack.pop(): 
+                return False
+        return not stack

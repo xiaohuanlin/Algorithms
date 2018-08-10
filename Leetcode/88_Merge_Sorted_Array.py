@@ -40,8 +40,6 @@ class Solution:
         if nums2_index >= 0:
             nums1[:result_index+1] = nums2[:nums2_index+1]
 
-        return nums1
-
 
 class TestSolution(unittest.TestCase):
 

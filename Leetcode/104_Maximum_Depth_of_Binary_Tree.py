@@ -56,7 +56,7 @@ class Solution:
         #         else:
         #             break
         # return depth
-
+        # --------------------------------------------
         def max_depth(node, depth):
             if node is None:
                 return depth
@@ -64,6 +64,7 @@ class Solution:
             return max(max_depth(node.left, depth + 1), max_depth(node.right, depth + 1))
         
         return max_depth(root, 1)
+        # --------------------------------------------
 
         
 

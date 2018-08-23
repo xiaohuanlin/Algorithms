@@ -26,6 +26,29 @@ class Solution:
         :type head: ListNode
         :rtype: bool
         """
+        # reverse the node list from mid node
+        fast = slow = head
+
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+        
+        # now, slow pointer is the mid node and we should reverse rest
+        parent, child = None, slow
+        while True:
+            if child is None:
+                node = parent
+                break
+            tmp = child.next
+            child.next = parent
+            parent, child = child, tmp
+        
+        # increse node and slow simultaneously
+        while node and head:
+            if node.val != head.val:
+                return False
+            node, head = node.next, head.next
+        return True
 
 
 class TestSolution(unittest.TestCase):

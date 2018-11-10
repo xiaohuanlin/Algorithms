@@ -18,7 +18,6 @@ Output: ["1->2->5", "1->3"]
 Explanation: All root-to-leaf paths are: 1->2->5, 1->3
 '''
 # Definition for a binary tree node.
-# todo: do it
 class TreeNode:
     def __init__(self, x):
         self.val = x
@@ -31,3 +30,16 @@ class Solution:
         :type root: TreeNode
         :rtype: List[str]
         """
+        if root is None:
+            return []
+        result = []
+        self.dfs(root, "", result)
+        return result
+
+    def dfs(self, root, pre_str, result):
+        if root.left is None and root.right is None:
+            result.append(pre_str + str(root.val))
+        if root.left:
+            self.dfs(root.left, pre_str + str(root.val) + "->", result)
+        if root.right:
+            self.dfs(root.right, pre_str + str(root.val) + "->", result)

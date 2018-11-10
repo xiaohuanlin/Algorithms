@@ -43,7 +43,26 @@ class Solution:
         :type A: List[str]
         :rtype: int
         """
-        # todo
+        result_dict = {}
+        for s in A:
+            spec_s = self.spec_eq(s)
+            # print(s, spec_s)
+            if spec_s not in result_dict:
+                result_dict[spec_s] = [s]
+            else:
+                result_dict[spec_s].append(s)
+        # print(result_dict)
+        return len(result_dict)
+
+    def spec_eq(self, s):
+        odd_sort = sorted(s[::2])
+        even_sort = sorted(s[1::2])
+        result = [0] * len(s)
+        for i, number in enumerate(odd_sort):
+            result[2*i] = odd_sort[i]
+        for i, number in enumerate(even_sort):
+            result[2 * i + 1] = even_sort[i]
+        return tuple(result)
 
 
 class TestSolution(unittest.TestCase):
@@ -59,7 +78,7 @@ class TestSolution(unittest.TestCase):
             self.assert_function(first, second)
 
     def assert_function(self, first, second):
-        self.assertEqual(Solution().surfaceArea(first), second,
+        self.assertEqual(Solution().numSpecialEquivGroups(first), second,
                          msg="first: {}; second: {}".format(first, second))
 
 

@@ -1,7 +1,17 @@
 import unittest
 import unittest.mock
 from enum import Enum, auto
-from typing import Optional
+
+
+class Nil:
+
+    def __eq__(self, other):
+        if isinstance(other, Nil):
+            return True
+        return False
+
+    def __repr__(self):
+        return 'nil({})'.format(None)
 
 
 class Color(Enum):
@@ -15,8 +25,8 @@ class RBNode:
         self.key = key
         self.color = color
         self.parent = parent if parent is not None else None
-        self.left = RBNode(left) if left is not None else None
-        self.right = RBNode(right) if right is not None else None
+        self.left = left if left is not None else None
+        self.right = right if right is not None else None
 
     def __repr__(self):
         return 'RBNode({}, {}, {}, {}, {})'.format(self.key, self.color, getattr(self.parent, 'key', None),
@@ -25,37 +35,44 @@ class RBNode:
     def __eq__(self, other):
         if isinstance(other, RBNode):
             return self.key == other.key and self.color == other.color and self.left == other.left and self.right == other.right
+        return False
 
 
 class RedBlackTree:
     def __init__(self, data=None, root=None):
+        if not hasattr(self, 'nil_node'):
+            nil_node = RBNode(Nil(), color=Color.BLACK)
+            self.nil_node = nil_node
         if data is not None:
             key = data[0]
-            self.root = RBNode(key, color=Color.BLACK)
+            self.root = RBNode(key, color=Color.BLACK, parent=self.nil_node, left=self.nil_node, right=self.nil_node)
             self.list_to_tree(data[1:])
         else:
             self.root = root
 
     def list_to_tree(self, key_list):
         for num in key_list:
-            node = RBNode(num, color=Color.RED)
+            node = RBNode(num, color=Color.RED, left=self.nil_node, right=self.nil_node)
             self.insert(node)
 
-    def get_valid_tree(self):
-        if self.root is None:
+    def get_valid_tree(self, detail=False):
+        if self.root == self.nil_node:
             return
         result = []
-        if self.root.left is not None:
-            result.extend(RedBlackTree(root=self.root.left).get_valid_tree())
-        # result.append((self.root.key, self.root.color))
-        result.append((self.root.key, self.root.color, self.root.parent))
-        if self.root.right is not None:
-            result.extend(RedBlackTree(root=self.root.right).get_valid_tree())
+        if self.root.left != self.nil_node:
+            result.extend(RedBlackTree(root=self.root.left).get_valid_tree(detail=detail))
+
+        if detail:
+            result.append((self.root.key, self.root.color, self.root.parent))
+        else:
+            result.append((self.root.key, self.root.color))
+        if self.root.right != self.nil_node:
+            result.extend(RedBlackTree(root=self.root.right).get_valid_tree(detail=detail))
         return result
 
-    def search(self, k):
+    def search(self,  k):
         # complexity: O(lgn)
-        if self.root is None or k == self.root.key:
+        if self.root == self.nil_node or k == self.root.key:
             return self.root
 
         if k < self.root.key:
@@ -70,12 +87,12 @@ class RedBlackTree:
 
         # connect the left child of rotate node with node
         node.right = rotate_node.left
-        if rotate_node.left is not None:
+        if rotate_node.left != self.nil_node:
             rotate_node.left.parent = node
 
         # connect the node parent with rotate node
         rotate_node.parent = node.parent
-        if node.parent is None:
+        if node.parent == self.nil_node:
             # empty tree
             self.root = rotate_node
         elif node.parent.left == node:
@@ -95,12 +112,12 @@ class RedBlackTree:
 
         # connect the right child of rotate node with node
         node.left = rotate_node.right
-        if rotate_node.right is not None:
+        if rotate_node.right != self.nil_node:
             rotate_node.right.parent = node
 
         # connect the node parent with rotate node
         rotate_node.parent = node.parent
-        if node.parent is None:
+        if node.parent == self.nil_node:
             # empty tree
             self.root = rotate_node
         elif node.parent.left == node:
@@ -117,27 +134,25 @@ class RedBlackTree:
 
     def insert(self, node: RBNode):
         root = self.root
-        if root is None:
-            # empty tree
-            self.root = node
-            return
-
-        root_copy = root
-        while root:
+        last_node = self.nil_node
+        while root != self.nil_node:
             # because after node has been substituted by its child, we can't know the origin root
-            root_copy = root
+            last_node = root
             if node.key < root.key:
                 root = root.left
             else:
                 root = root.right
 
-        node.parent = root_copy
+        node.parent = last_node
 
+        if last_node == self.nil_node:
+            # empty tree
+            self.root = node
         # revise the parent node information
-        if node.key < root_copy.key:
-            root_copy.left = node
+        elif node.key < last_node.key:
+            last_node.left = node
         else:
-            root_copy.right = node
+            last_node.right = node
         # ---------------------------------------------------
         # that is the additional code
         node.color = Color.RED
@@ -145,10 +160,10 @@ class RedBlackTree:
 
     def insert_fix_up(self, node: RBNode):
         # complexity: O(lgn)
-        while getattr(node.parent, 'color', Color.BLACK) == Color.RED:
+        while node.parent.color == Color.RED:
             if node.parent == node.parent.parent.left:
                 uncle = node.parent.parent.right
-                if getattr(uncle, 'color', Color.BLACK) == Color.RED:
+                if uncle.color == Color.RED:
                     # when uncle color is red, we need change those into black to satisfy the feature 4
                     node.parent.color = Color.BLACK
                     uncle.color = Color.BLACK
@@ -168,7 +183,7 @@ class RedBlackTree:
             else:
                 # same as before except the direction. We should put all data to right, and left rotate
                 uncle = node.parent.parent.left
-                if getattr(uncle, 'color', Color.BLACK) == Color.RED:
+                if uncle.color == Color.RED:
                     # when uncle color is red, we need change those into black to satisfy the feature 4
                     node.parent.color = Color.BLACK
                     uncle.color = Color.BLACK
@@ -191,7 +206,9 @@ class RedBlackTree:
     def minimum(self):
         # complexity: O(lgn)
         node = self.root
-        while node.left is not None:
+        if node == self.nil_node:
+            return node
+        while node.left != self.nil_node:
             node = node.left
         return node
 
@@ -199,11 +216,11 @@ class RedBlackTree:
         # complexity: O(lgn)
         new_node_color = node.color
 
-        if node.left is None:
+        if node.left == self.nil_node:
             # left is None or left and right both are None
             fix_up_node = node.right
             transplant(self, node, fix_up_node)
-        elif node.right is None:
+        elif node.right == self.nil_node:
             # only right is None
             fix_up_node = node.left
             transplant(self, node, fix_up_node)
@@ -216,7 +233,7 @@ class RedBlackTree:
             fix_up_node = new_node.right
 
             if new_node.parent == node:
-                # todo: it seems don't have any work
+                # it can change the nil node parent and let the next stage of deleting work well
                 fix_up_node.parent = new_node
             else:
                 # this means the new node have left child, because if it has, the minimum won't be it
@@ -235,15 +252,14 @@ class RedBlackTree:
 
         if new_node_color == Color.BLACK:
             # deal with the core node, which will be the child of node parent
-            print(self.get_valid_tree())
             self.delete_fix_up(fix_up_node)
 
     def delete_fix_up(self, node: RBNode):
-        # todo: add null node to update this method
-        while node != self.root and getattr(node, 'color', Color.BLACK) == Color.BLACK:
+
+        while node != self.root and node.color == Color.BLACK:
             if node == node.parent.left:
                 brother = node.parent.right
-                if getattr(brother, 'color', Color.BLACK) == Color.RED:
+                if node.color == Color.RED:
                     # to make the brother color to be black
                     brother.color = Color.BLACK
                     node.parent.color = Color.RED
@@ -273,7 +289,7 @@ class RedBlackTree:
                     node = self.root
             else:
                 brother = node.parent.left
-                if getattr(brother, 'color', Color.BLACK) == Color.RED:
+                if node.color == Color.RED:
                     brother.color = Color.BLACK
                     node.parent.color = Color.RED
                     self.right_rotate(node.parent)
@@ -314,28 +330,25 @@ class TestSolution(unittest.TestCase):
 
     def test_RedBlackTree(self):
         examples = (
-            # (([6, 3, 8, 1, 5, 9, 23, 56, 33, 46, 77, 88],
-            #   ('left_rotate', 3),
-            #   ('insert', 100)
-            #   ),
-            #  ([(1, Color.RED), (3, Color.BLACK), (5, Color.RED), (6, Color.BLACK), (8, Color.BLACK),
-            #    (9, Color.BLACK), (23, Color.BLACK), (33, Color.BLACK), (46, Color.BLACK),
-            #    (56, Color.RED), (77, Color.BLACK), (88, Color.RED)],
-            #   [(1, Color.RED), (3, Color.BLACK), (5, Color.RED), (6, Color.BLACK), (8, Color.BLACK),
-            #    (9, Color.BLACK), (23, Color.BLACK), (33, Color.BLACK), (46, Color.BLACK),
-            #    (56, Color.RED), (77, Color.RED), (88, Color.BLACK), (100, Color.RED)]
-            #   )),
+            (([6, 3, 8, 1, 5, 9, 23, 56, 33, 46, 77, 88],
+              ('left_rotate', 3),
+              ('insert', 100)
+              ),
+             ([(1, Color.RED), (3, Color.BLACK), (5, Color.RED), (6, Color.BLACK), (8, Color.BLACK),
+               (9, Color.BLACK), (23, Color.BLACK), (33, Color.BLACK), (46, Color.BLACK),
+               (56, Color.RED), (77, Color.BLACK), (88, Color.RED)],
+              [(1, Color.RED), (3, Color.BLACK), (5, Color.RED), (6, Color.BLACK), (8, Color.BLACK),
+               (9, Color.BLACK), (23, Color.BLACK), (33, Color.BLACK), (46, Color.BLACK),
+               (56, Color.RED), (77, Color.RED), (88, Color.BLACK), (100, Color.RED)]
+              )),
             (([41, 38, 31, 12, 19, 8],
-              # ('insert', 8),
               ('delete', 8),
-              ('delete', 12)),
-             (
-              # [(8, Color.RED), (12, Color.BLACK), (19, Color.RED), (31, Color.BLACK),
-              #  (38, Color.BLACK), (41, Color.BLACK)],
-              [(12, Color.BLACK), (19, Color.RED), (31, Color.BLACK),
+              ('delete', 19)),
+             ([(12, Color.BLACK), (19, Color.RED), (31, Color.BLACK),
+               (38, Color.BLACK), (41, Color.BLACK)],
+              [(12, Color.RED), (31, Color.BLACK),
                (38, Color.BLACK), (41, Color.BLACK)]
-              )
-             ),
+              )),
         )
         for first, second in examples:
             self.assert_RedBlackTree(first, second)
@@ -343,18 +356,18 @@ class TestSolution(unittest.TestCase):
     def assert_RedBlackTree(self, first, second):
         data, *action = first
         rbt = RedBlackTree(data)
+        nil_node = RBNode(Nil(), color=Color.BLACK)
         for act, res in zip(action, second):
             func, *para = act
             if func in ('delete', 'left_rotate'):
                 node = rbt.search(*para)
                 getattr(rbt, func)(node)
-                # print(rbt.get_valid_tree())
-                # self.assertEqual(rbt.get_valid_tree(), res,
-                #                  msg="first: {}; second: {}".format(first, second))
+                # print(rbt.get_valid_tree(detail=True))
+                self.assertEqual(rbt.get_valid_tree(), res,
+                                 msg="first: {}; second: {}".format(first, second))
             else:
-                node = RBNode(*para)
+                node = RBNode(*para, left=nil_node, right=nil_node)
                 getattr(rbt, func)(node)
-                # print(rbt.get_valid_tree())
                 self.assertEqual(rbt.get_valid_tree(), res,
                                  msg="first: {}; second: {}".format(first, second))
 

@@ -22,24 +22,16 @@ class BSTNode:
 class BST:
     def __init__(self, data=None, root=None):
         if data is not None:
-            data = sorted(data)
-            key = data[len(data) // 2]
+            key = data[0]
             self.root = BSTNode(key)
-            self.list_to_tree(self.root, 'left', data[:len(data) // 2])
-            self.list_to_tree(self.root, 'right', data[len(data) // 2 + 1:])
+            self.list_to_tree(data[1:])
         else:
             self.root = root
 
-    def list_to_tree(self, root_node, direction, key_list):
-
-        if root_node is None or not key_list:
-            return
-        key = key_list[len(key_list) // 2]
-        node = BSTNode(key, root_node)
-        setattr(root_node, direction, node)
-
-        self.list_to_tree(node, 'left', key_list[:len(key_list) // 2])
-        self.list_to_tree(node, 'right', key_list[len(key_list) // 2 + 1:])
+    def list_to_tree(self, key_list):
+        for num in key_list:
+            node = BSTNode(num)
+            self.insert(node)
 
     def get_valid_tree(self):
         if self.root is None:

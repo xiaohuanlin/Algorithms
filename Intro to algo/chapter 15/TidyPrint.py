@@ -29,7 +29,7 @@ def tidy_print(l_list, max_l_per_line):
                     select[i][j] = k + 1
 
     print_tidy_print(select, l_list, max_l_per_line, 1, n)
-    return result[0][ n-1]
+    return result[0][n-1]
 
 
 def print_tidy_print(select, l_list, max_l_per_line, start, end):

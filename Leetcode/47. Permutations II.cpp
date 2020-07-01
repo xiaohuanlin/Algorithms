@@ -5,24 +5,22 @@
 #include <iostream>
 using namespace std;
 
-// Given a collection of distinct integers, return all possible permutations.
+// Given a collection of numbers that might contain duplicates, return all possible unique permutations.
 
 // Example:
 
-// Input: [1,2,3]
+// Input: [1,1,2]
 // Output:
 // [
-//   [1,2,3],
-//   [1,3,2],
-//   [2,1,3],
-//   [2,3,1],
-//   [3,1,2],
-//   [3,2,1]
+//   [1,1,2],
+//   [1,2,1],
+//   [2,1,1]
 // ]
 
 class Solution {
 public:
-    vector<vector<int>> permute(vector<int>& nums) {
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
         vector<vector<int>> res;
         core_permute(res, nums, 0);
         return res;
@@ -35,17 +33,29 @@ public:
         }
 
         for (int k = start; k < nums.size(); k++) {
-            swap(nums[start], nums[k]);
+            if (k > start && nums[k] == nums[k-1]) {
+                continue;
+            }
+
+            int tmp = nums[k];
+            for (int j = k; j > start; j--) {
+                nums[j] = nums[j-1];
+            }
+            nums[start] = tmp;
             core_permute(res, nums, start + 1);
-            swap(nums[start], nums[k]);
+
+            for (int j = start; j < k; j++) {
+                nums[j] = nums[j+1];
+            }
+            nums[k] = tmp;
         }
     }
 };
 
 int main() {
     Solution s;
-    vector<int> array = {1,2,3};
-    auto res = s.permute(array);
+    vector<int> array = {0, 1, 0, 0, 9};
+    auto res = s.permuteUnique(array);
     for (auto e: res) {
         for (auto l: e) {
             cout << l << ',';

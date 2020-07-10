@@ -104,10 +104,36 @@ public:
         }
 
     }
+
+
+    int maxProductNew2(vector<int>& nums) {
+        if (nums.size() == 0) {
+            return 0;
+        }
+
+        int positive_max = nums[0];
+        int negetive_min = nums[0];
+        int max_value = nums[0];
+        
+        for (int i = 1; i < nums.size(); i++) {
+
+            if (nums[i] > 0) {
+                positive_max = max(positive_max * nums[i], nums[i]);
+                negetive_min = min(negetive_min * nums[i], nums[i]);
+            } else {
+                int tmp = positive_max;
+                positive_max = max(negetive_min * nums[i], nums[i]);
+                negetive_min = min(tmp * nums[i], nums[i]);
+            }
+            max_value = max(max_value, positive_max);
+        }
+
+        return max_value;
+    }
 };
 
 int main() {
     Solution s;
-    vector<int> array = {-2, 0, -1};
-    cout << s.maxProduct(array);
+    vector<int> array = {-1, -2, -3, 4, -5};
+    cout << s.maxProductNew2(array);
 }

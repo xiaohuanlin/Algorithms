@@ -54,17 +54,9 @@ private:
 
 public:
     BSTIterator(TreeNode* root) {
-        candidates.push(root);
-
-        while (!candidates.empty()) {
-            auto item = candidates.top();
-            candidates.pop();
-            if (!item) {
-                break;
-            }
-
-            candidates.push(item->right);
-            candidates.push(item->left);
+        while (root) {
+            candidates.push(root);
+            root = root->left;
         }
     }
     
@@ -72,12 +64,13 @@ public:
     int next() {
         auto item = candidates.top();
         candidates.pop();
-        if (item->right) {
-            candidates.push(item->right);
+
+        TreeNode* iter = item->right;
+        while (iter) {
+            candidates.push(iter);
+            iter = iter->left;
         }
-        if (item->left) {
-            candidates.push(item->left);
-        }
+
         return item->val;
     }
     
@@ -95,8 +88,4 @@ public:
  */
 
 int main() {
-
-    BSTIterator* obj = new BSTIterator(root);
-    int param_1 = obj->next();
-    bool param_2 = obj->hasNext();
 }

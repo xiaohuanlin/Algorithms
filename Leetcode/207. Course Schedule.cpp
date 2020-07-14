@@ -44,52 +44,96 @@ using namespace std;
 class Solution {
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        unordered_map<int, vector<int>> nextcourses;
-        unordered_set<int> visited;
-
+        unordered_map<int, vector<int>> adjacent;
+        unordered_map<int, int> store;
         for (int i = 0; i < prerequisites.size(); i++) {
-            if (prerequisites[i].empty()) {
+            if (adjacent.find(prerequisites[i][1]) == adjacent.end()) {
+                adjacent[prerequisites[i][1]] = vector<int>();
+            }
+            adjacent[prerequisites[i][1]].push_back(prerequisites[i][0]);
+
+            if (store.find(prerequisites[i][0]) == store.end()) {
+                store[prerequisites[i][0]] = 0;
+            }
+            store[prerequisites[i][0]]++;
+        }
+
+        bool end = true;
+        while (end) {
+            end = false;
+            for (auto iter = adjacent.begin(); iter != adjacent.end(); iter++) {
+                if (store.find((*iter).first) == store.end()) {
+                    auto item = (*iter).second;
+                    for (int i = 0; i < item.size(); i++) {
+                        if (--store[item[i]] == 0) {
+                            store.erase(item[i]);
+                        }
+                    }
+                    adjacent.erase((*iter).first);
+                    end = true;
+                    break;
+                }
+            }
+        }
+
+        return adjacent.empty();
+    }
+
+    bool canFinishNew(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, vector<int>> adjacent;
+        for (int i = 0; i < prerequisites.size(); i++) {
+            if (adjacent.find(prerequisites[i][1]) == adjacent.end()) {
+                adjacent[prerequisites[i][1]] = vector<int>();
+            }
+            adjacent[prerequisites[i][1]].push_back(prerequisites[i][0]);
+        }
+        unordered_set<int> path, done;
+        
+        bool result = true;
+        for (auto iter = adjacent.begin(); iter != adjacent.end(); iter++) {
+            if (done.find((*iter).first) != done.end()) {
                 continue;
             }
-            if (nextcourses.find(prerequisites[i][1]) == nextcourses.end()) {
-                nextcourses[prerequisites[i][1]] = vector<int>();
+
+            done.insert((*iter).first);
+            dfs(adjacent, path, done, (*iter).first, result);
+            if (!result) {
+                return false;
             }
-            nextcourses[prerequisites[i][1]].push_back(prerequisites[i][0]);
         }
-
-        stack<int> candidates;
-        for (auto iter = nextcourses.begin(); iter != nextcourses.end(); iter++) {
-            candidates.push((*iter).first);
-            while (!candidates.empty()) {
-                auto item = candidates.top();
-                candidates.pop();
-
-                if (visited.find(item) != visited.end()) {
-                    return false;
-                }
-                if (nextcourses.find(item) == nextcourses.end()) {
-                    continue;
-                }
-                visited.insert(item);
-
-                for (int i = 0; i < nextcourses[item].size(); i++) {
-                    candidates.push(nextcourses[item][i]);
-                }
-            }
-            visited.clear();
-        }
-
         return true;
+    }
+
+    void dfs(unordered_map<int, vector<int>> &adjacent, unordered_set<int> &path, unordered_set<int> &done, 
+            int start, bool &result) {
+        if (!result || path.find(start) != path.end()) {
+            result = false;
+            return;
+        }
+
+        if (adjacent.find(start) == adjacent.end()) {
+            return;
+        }
+
+        done.insert(start);
+        path.insert(start);
+
+        for (int i = 0; i < adjacent[start].size(); i++) {
+            dfs(adjacent, path, done, adjacent[start][i], result);
+
+            if (!result) {
+                return;
+            }
+        }
+
+        path.erase(start);
     }
 };
 
 int main() {
     Solution s;
     vector<vector<int>> array = {
-        {0,1},
-        {0,2},
-        {1,2},
+        {1,0},
     };
-    cout << s.canFinish(5, array);
-    // todo
+    cout << s.canFinishNew(5, array);
 }

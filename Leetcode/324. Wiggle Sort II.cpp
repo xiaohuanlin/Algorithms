@@ -29,17 +29,27 @@ using namespace std;
 class Solution {
 public:
     void wiggleSort(vector<int>& nums) {
-		if (nums.size() <= 1) {
+		int middle_size = (nums.size() - 1) / 2;
+		if (middle_size <= 0) {
 			return;
 		}
 
-		if (nums[0] > nums[1]) {
-			swap(nums[0], nums[1]);
-		}
+		nth_element(nums.begin(), nums.begin() + middle_size, nums.end());
+		int middle_value = nums[middle_size];
 
-		for (int i = 2; i < nums.size(); i++) {
-			if (!((nums[i-2] < nums[i-1]) ^ (nums[i-1] < nums[i]))) {
-				swap(nums[i-1], nums[i]);
+		// odd place larger number, even place small number
+		int odd = 1;
+		int even = (nums.size() - 1) % 2 == 0? nums.size() - 1: nums.size() - 2;
+		int count = 0;
+		while (count < nums.size()) {
+			if (nums[count] > middle_size && (count > odd || count % 2 == 0)) {
+				swap(nums[count], nums[odd]);
+				odd += 2;
+			} else if (nums[count] < middle_size && (count < even || count % 2 == 1)) {
+				swap(nums[count], nums[even]);
+				even -= 2;
+			} else {
+				count ++;
 			}
 		}
     }
@@ -48,7 +58,7 @@ public:
 
 int main() {
 	Solution s;
-	vector<int> array = {1,5,1,1,6,4};
+	vector<int> array = {1,3,2,2,3,1};
 	s.wiggleSort(array);
 	for (auto e: array) {
 		cout << e << ',';

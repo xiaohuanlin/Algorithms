@@ -30,30 +30,9 @@ using namespace std;
 class Solution {
 public:
     vector<int> largestDivisibleSubset(vector<int>& nums) {
-        vector<int> res, path;
-        int max_len = 0;
-        sort(nums.begin(), nums.end());
-        backtrace(res, path, max_len, nums, -1);
-        return res;
+        vector<vector<int>> dps(nums.size(), vector<int>());
     }
 
-    void backtrace(vector<int> &res, vector<int> &path, int &max_length, vector<int> &candidate, int start) {
-        bool find = false;
-        for (int i = start + 1; i < candidate.size(); i++) {
-            if (start == -1 || candidate[i] % candidate[start] == 0) {
-                find = true;
-                path.push_back(candidate[i]);
-                backtrace(res, path, max_length, candidate, i);
-                path.pop_back();
-            }
-        }
-        if (!find && path.size() > max_length) {
-            res = path;
-            max_length = path.size();
-            return;
-        }
-
-    }
 };
 
 

@@ -43,7 +43,30 @@ using namespace std;
 class Solution {
 public:
     vector<int> findFrequentTreeSum(TreeNode* root) {
-        
+      unordered_map<int,int> res;
+      vector<int> ans;
+      int max_value = 0;
+      core(res, root, max_value);
+
+      for (const auto &item: res) {
+        if (item.second == max_value) {
+          ans.push_back(item.first);
+        }
+      }
+      return ans;
+    }
+
+    int core(unordered_map<int, int> &res, TreeNode* root, int& max_count) {
+      if (!root) {
+        return 0;
+      }
+
+      int total = root->val;
+      total += core(res, root->left, max_count);
+      total += core(res, root->right, max_count);
+      res[total]++;
+      max_count = max(max_count, res[total]);
+      return total;
     }
 };
 

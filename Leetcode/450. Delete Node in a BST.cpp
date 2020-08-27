@@ -73,15 +73,17 @@ public:
                 left = false;
             } else {
                 // delete it and change it
-                TreeNode* deleted;
-                if (deleted = findpre(iter)) {
-                    iter->val = deleted->val;
-                    break;
-                }
-
-                if (deleted = findnext(iter)) {
-                    iter->val = deleted->val;
-                    break;
+                while (true) {
+                    TreeNode* deleted;
+                    if ((deleted = findpre(iter, &parent, &left))) {
+                        iter->val = deleted->val;
+                        iter = deleted;
+                    } else if ((deleted = findnext(iter, &parent, &left))) {
+                        iter->val = deleted->val;
+                        iter = deleted;
+                    } else {
+                        break;
+                    }
                 }
 
                 if (!parent) {
@@ -100,44 +102,46 @@ public:
         
     }
 
-    TreeNode* findpre(TreeNode* node) {
+    TreeNode* findpre(TreeNode* node, TreeNode** parent, bool* left) {
         if (!node || !node->left) {
             return nullptr;
         }
         
-        TreeNode* parent = nullptr, *iter = node->left;
+        TreeNode* iter = node->left;
+        *left = true;
+        *parent = node;
         while (iter && iter->right) {
-            parent = iter;
+            *parent = iter;
+            *left = false;
             iter = iter->right;
-        }
-        if (parent) {
-            parent->right = nullptr;
-        } else {
-            iter = node->left;
-            node->left = node->left->left;
         }
         return iter;
     }
 
-    TreeNode* findnext(TreeNode* node) {
+    TreeNode* findnext(TreeNode* node, TreeNode** parent, bool* left) {
         if (!node || !node->right) {
             return nullptr;
         }
         
-        TreeNode* parent = nullptr, *iter = node->right;
+        TreeNode* iter = node->right;
+        *left = false;
+        *parent = node;
         while (iter && iter->left) {
-            parent = iter;
+            *parent = iter;
+            *left = true;
             iter = iter->left;
-        }
-        if (parent) {
-            parent->left= nullptr;
-        } else {
-            iter = node->right;
-            node->right= node->right->right;
         }
         return iter;
     }
 };
 
 int main() {
+    TreeNode n2(2);
+    TreeNode n4(4);
+    TreeNode n7(7);
+    TreeNode n3(3, &n2, &n4);
+    TreeNode n6(6, nullptr, &n7);
+    TreeNode n5(5, &n3, &n6);
+    Solution s;
+    auto node = s.deleteNode(&n5, 3);
 }

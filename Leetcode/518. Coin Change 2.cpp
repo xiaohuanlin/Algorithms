@@ -49,15 +49,39 @@ using namespace std;
 class Solution {
 public:
     int change(int amount, vector<int>& coins) {
-        
+        if (amount == 0) {
+            return 1;
+        }
+        vector<vector<int>> dp(amount+1, vector<int>(coins.size(), 0));
+        sort(coins.begin(), coins.end());
 
+        for (int i = 1; i < dp.size(); ++i) {
+            for (int j = 0; j < coins.size(); ++j) {
+                if (i - coins[j] > 0) {
+                    for (int k = 0; k < coins.size(); ++k) {
+                        if (coins[j] < coins[k]) {
+                            break;
+                        }
+                        dp[i][j] += dp[i - coins[j]][k];
+                    }
+                } else if (i - coins[j] == 0) {
+                    dp[i][j] = 1;
+                }
+            }
+        }
+
+        int result = 0;
+        for (int k = 0; k < coins.size(); ++k) {
+            result += dp[amount][k];
+        }
+        return result;
     }
 };
 
 
 int main() {
     Solution s;
-    vector<int> array {0,0,0,0,0,0,0,0,1};
-    cout << s.change(1, array);
+    vector<int> array {2};
+    cout << s.change(0, array);
 
 }

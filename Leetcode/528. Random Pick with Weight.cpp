@@ -63,51 +63,35 @@ using namespace std;
 // pickIndex will be called at most 10000 times.
 
 class Solution {
-    int all_sum;
-    vector<int> bounds;
-    vector<int> log2index;
+    int sum;
+    vector<pair<int, int>> bounds;
 public:
     Solution(vector<int>& w) {
-        int sum = 0;
+        sum = 0;
         for (int i = 0; i < w.size(); i++) {
+            bounds.push_back({sum, sum+w[i]});
             sum += w[i];
-            bounds.push_back(sum);
-        }
-        all_sum = sum;
-
-        // build a list tell the according num bound of 2^x
-        // bounds: [1, 5, 9]
-        // log2: 2^0, 2^1, 2^2, 2^3 
-        // log2index: [0, 1, 1, 2]
-        int max_v = int(log2(sum)) + 1;
-        int j = 0;
-        log2index.push_back(0);
-        for (int i = 0; i < max_v; i++) {
-            int found_v = (1 << i);
-            while (found_v >= bounds[j]) {
-                j++;
-            }
-            log2index.push_back(j);
         }
     }
     
     int pickIndex() {
-        int rand_v = rand() % all_sum;
-        // cout << "get rand_v: " << rand_v << endl;
+        int rand_v = rand() % sum;
         // find bounds by log2index
-        int max_v = int(log2index.size() - 1);
-        int log_min = 0;
-        if (rand_v) {
-            log_min = min(int(log2(rand_v)) + 1, max_v);
-        }
-        int log_max = min(log_min + 1, max_v);
+        cout << "get rand " << rand_v << endl;
 
-        for (int start = log2index[log_min]; start <= log2index[log_max]; start++) {
-            if (rand_v < bounds[start]) {
-                return start;
+        int start = 0;
+        int end = bounds.size();
+        while (start < end) {
+            int middle = start + (end - start) / 2;
+            if (rand_v < bounds[middle].first) {
+                end = middle - 1;
+            } else if (rand_v >= bounds[middle].second) {
+                start = middle + 1;
+            } else {
+                return middle;
             }
         }
-        return -1;
+        return start;
     }
 };
 
@@ -118,7 +102,7 @@ public:
  */
 
 int main() {
-    vector<int> array {1, 3, 1};
+    vector<int> array {3, 14, 1, 7};
     Solution s(array);
     cout << s.pickIndex() << endl;
     cout << s.pickIndex() << endl;

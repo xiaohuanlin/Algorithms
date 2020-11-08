@@ -30,14 +30,24 @@ using namespace std;
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
-        
+        // the number appear more than once will have special pattern for certain bit, so find it and 
+        // figure out what is the special number
+        int shift = 0;
+        unsigned int res = 0;
+        while (shift < 32) {
+            unsigned int count = 0;
+            for (int i = 0; i < nums.size(); i++) {
+                count += ((nums[i] >> shift) & 1);
+            }
+            if (count % 3) {
+                res = res + (1 << shift);
+            }
+            shift++;
+        }
+        return res;
     }
 };
 
 
 int main() {
-    Solution s;
-    vector<int> gas = {1,2,3,4,5};
-    vector<int> cost = {3,4,5,1,2};
-    cout << s.canCompleteCircuitNew(gas, cost);
 }

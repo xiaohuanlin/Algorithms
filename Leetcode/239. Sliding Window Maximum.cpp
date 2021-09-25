@@ -1,6 +1,5 @@
-#include <unordered_set>
-#include <unordered_map>
 #include <math.h>
+#include <deque>
 #include <utility>
 #include <stack>
 #include <algorithm>
@@ -59,35 +58,24 @@ using namespace std;
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-        vector<int> next_max(nums.size(), 0);
-        vector<int> prev_max(nums.size(), 0);
-        stack<int> candidates_min, candidates_max;
-
-        for (int i = nums.size() - 1; i >= 0; i--) {
-            int j = nums.size() - 1 - i;
-            while (!candidates_min.empty() && nums[candidates_min.top()] <= nums[i]) {
-                candidates_min.pop();
-            }
-            while (!candidates_max.empty() && nums[candidates_max.top()] <= nums[j]) {
-                candidates_max.pop();
-            }
-
-            next_max[i] = candidates_min.empty() ? nums.size(): candidates_min.top();
-            prev_max[j] = candidates_max.empty() ? -1: candidates_max.top();
-            candidates_min.push(i);
-            candidates_max.push(j);
-        }
-
-        vector<int> res(nums.size() - k + 1, 0);
+        // store the increasement array
+        deque<int> candidates;
+        vector<int> res;
         for (int i = 0; i < nums.size(); i++) {
-            int prev_index = prev_max[i];
-            int next_index = next_max[i];
-            // limit k step for prev and next index
-            for (int j = max(prev_index + 1, i - k + 1); j + k <= next_index; j++) {
-                res[j] = nums[i];
+            // remove useless element
+            if (!candidates.empty() && i - k == candidates.front()) {
+                candidates.pop_front();
+            }
+
+            while (!candidates.empty() && nums[candidates.back()] < nums[i]) {
+                candidates.pop_back();
+            }
+
+            candidates.push_back(i);
+            if (i >= k - 1) {
+                res.push_back(nums[candidates.front()]);
             }
         }
-
         return res;
     }
 };
@@ -96,11 +84,11 @@ public:
 int main() {
     Solution s;
     vector<tuple<tuple<vector<int>, int>, vector<int>>> test_cases {
-        // {{{1}, 1}, {1}},
-        // {{{1, -1}, 1}, {1, -1}},
-        // {{{9, 11}, 2}, {11}},
-        // {{{4, -2}, 2}, {4}},
-        // {{{1,3,-1,-3,5,3,6,7}, 3}, {3,3,5,5,6,7}},
+        {{{1}, 1}, {1}},
+        {{{1, -1}, 1}, {1, -1}},
+        {{{9, 11}, 2}, {11}},
+        {{{4, -2}, 2}, {4}},
+        {{{1,3,-1,-3,5,3,6,7}, 3}, {3,3,5,5,6,7}},
         {{{-7,-8,7,5,7,1,6,0}, 4}, {7,7,7,7,7}},
     };
 

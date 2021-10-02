@@ -48,26 +48,23 @@ public:
         if (sum % 2 != 0) {
             return false;
         }
-        return backtrace(0, sum/2, nums);
-    }
 
-    bool backtrace(int sum, int target, vector<int> &candidate) {
-        if (sum == target) {
-            return true;
-        } else if (sum > target) {
-            return false;
+        int target = sum / 2;
+        vector<vector<bool>> dp(nums.size() + 1, vector<bool>(target + 1, false));
+
+        for (int i = 0; i < dp.size(); i++) {
+            dp[i][0] = true;
         }
 
-        int size = candidate.size();
-        for (int i = 0; i < size; i++) {
-            int value = candidate[i];
-            candidate.erase(candidate.cbegin() + i);
-            if (backtrace(sum + value, target, candidate)) {
-                return true;
+        // i means previous number
+        // j means target value
+        for (int i = 1; i < dp.size(); i++) {
+            for (int j = 1; j < dp[0].size(); j++) {
+                dp[i][j] = (j >= nums[i - 1] ? dp[i - 1][j - nums[i - 1]]: false) ||
+                            (dp[i - 1][j]);
             }
-            candidate.insert(candidate.cbegin() + i, value);
         }
-        return false;
+        return dp[dp.size() - 1][target];
     }
 };
 
@@ -75,5 +72,4 @@ int main() {
     Solution s;
     vector<int> array = {1,5,11,5};
     cout << s.canPartition(array);
-    // todo
 }

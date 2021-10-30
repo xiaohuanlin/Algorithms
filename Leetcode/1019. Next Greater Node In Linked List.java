@@ -27,7 +27,7 @@ import java.util.*;
 // 1 <= Node.val <= 109
 
 
-class Solution863 {
+class Solution1019 {
     /**
      * Definition for a binary tree node.
      */
@@ -63,7 +63,7 @@ class Solution863 {
     }
 }
 
-class Driver863 {
+class Driver1019 {
     public static void main(String[] args) {
     }
 }

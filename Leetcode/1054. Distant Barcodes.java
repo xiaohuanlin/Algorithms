@@ -1,5 +1,3 @@
-import java.lang.invoke.TypeDescriptor.OfMethod;
-import java.security.KeyStore.Entry;
 import java.util.*;
 
 // In a warehouse, there is a row of barcodes, where the ith barcode is barcodes[i].

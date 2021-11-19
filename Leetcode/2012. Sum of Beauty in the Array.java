@@ -1,7 +1,4 @@
-import java.io.LineNumberInputStream;
 import java.util.*;
-
-import javax.security.auth.callback.Callback;
 
 // You are given a 0-indexed integer array nums. For each index i (1 <= i <= nums.length - 2) the beauty of nums[i] equals:
 

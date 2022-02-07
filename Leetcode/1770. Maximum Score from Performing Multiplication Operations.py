@@ -40,7 +40,6 @@ m == multipliers.length
 m <= n <= 105
 -1000 <= nums[i], multipliers[i] <= 1000
 '''
-from audioop import mul
 from typing import *
 
 import unittest

@@ -53,7 +53,7 @@ class Solution:
 class TestSolution(unittest.TestCase):
     def test_case(self):
         examples = (
-            (("lEetcOde",)"lEOtcede"),
+            (("lEetcOde",), "lEOtcede"),
         )
         for first, second in examples:
             self.assert_function(first, second)

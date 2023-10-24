@@ -58,7 +58,6 @@ class Solution:
 
 
 
-
 class TestSolution(unittest.TestCase):
 
     def test_case(self):

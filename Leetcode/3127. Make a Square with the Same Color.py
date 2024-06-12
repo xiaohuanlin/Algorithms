@@ -82,7 +82,7 @@ class Solution:
         for i in range(len(grid) - 1):
             for j in range(len(grid) - 1):
                 l = [grid[i][j], grid[i][j+1], grid[i+1][j], grid[i+1][j+1]]
-                if l.count('W') == 1 or l.count('B') == 1:
+                if l.count('W') <= 1 or l.count('B') <= 1:
                     return True
         return False
 

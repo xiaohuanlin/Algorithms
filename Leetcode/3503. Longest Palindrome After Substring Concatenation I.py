@@ -1,56 +1,58 @@
 '''
-You are given a 2D integer array properties having dimensions n x m and an integer k.
+You are given two strings, s and t.
 
-Define a function intersect(a, b) that returns the number of distinct integers common to both arrays a and b.
+You can create a new string by selecting a substring from s (possibly empty) and a substring from t (possibly empty), then concatenating them in order.
 
-Construct an undirected graph where each index i corresponds to properties[i]. There is an edge between node i and node j if and only if intersect(properties[i], properties[j]) >= k, where i and j are in the range [0, n - 1] and i != j.
-
-Return the number of connected components in the resulting graph.
+Return the length of the longest palindrome that can be formed this way.
 
  
 
 Example 1:
 
-Input: properties = [[1,2],[1,1],[3,4],[4,5],[5,6],[7,7]], k = 1
-
-Output: 3
-
-Explanation:
-
-The graph formed has 3 connected components:
-
-
-
-Example 2:
-
-Input: properties = [[1,2,3],[2,3,4],[4,3,5]], k = 2
-
-Output: 1
-
-Explanation:
-
-The graph formed has 1 connected component:
-
-
-
-Example 3:
-
-Input: properties = [[1,1],[1,1]], k = 2
+Input: s = "a", t = "a"
 
 Output: 2
 
 Explanation:
 
-intersect(properties[0], properties[1]) = 1, which is less than k. This means there is no edge between properties[0] and properties[1] in the graph.
+Concatenating "a" from s and "a" from t results in "aa", which is a palindrome of length 2.
+
+Example 2:
+
+Input: s = "abc", t = "def"
+
+Output: 1
+
+Explanation:
+
+Since all characters are different, the longest palindrome is any single character, so the answer is 1.
+
+Example 3:
+
+Input: s = "b", t = "aaaa"
+
+Output: 4
+
+Explanation:
+
+Selecting "aaaa" from t is the longest palindrome, so the answer is 4.
+
+Example 4:
+
+Input: s = "abcde", t = "ecdba"
+
+Output: 5
+
+Explanation:
+
+Concatenating "abc" from s and "ba" from t results in "abcba", which is a palindrome of length 5.
 
  
 
 Constraints:
 
-1 <= n == properties.length <= 100
-1 <= m == properties[i].length <= 100
-1 <= properties[i][j] <= 100
-1 <= k <= m
+1 <= s.length, t.length <= 30
+s and t consist of lowercase English letters.
 '''
 from typing import *
 

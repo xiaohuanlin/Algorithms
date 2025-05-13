@@ -103,7 +103,6 @@ class Solution:
                         if not isprime(v) and dis[v] > dis[u] + v:
                             dis[v] = dis[u] + v
                             heappush(q, (dis[v], v))
-            print(q)
         return -1
 
 
